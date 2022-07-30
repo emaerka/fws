@@ -188,7 +188,17 @@ function request() {
   );
 }
 
+const handleError = (e, text) => {
+    alert(text ?? 'Error', e)
+}
+
 const deleteProject = (projectId) => {
-  Inertia.delete(route("projects.delete", { project: projectId }), {});
+  Inertia.delete(route("projects.delete", { project: projectId }), {
+    onBefore: () => confirm('Are you sure you want to delete this user?'),
+    preserveState: false, 
+        replace: true, 
+        onSuccess: () => {  },
+        onError:(e) => { handleError(e)}, 
+  });
 };
 </script>

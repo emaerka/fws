@@ -228,8 +228,13 @@ const handleError = (e, text) => {
 
 const deleteContactPerson = (id) => {
     Inertia.delete(route('contact-person.delete', {contactPerson: id}),
-    {},
-    { preserveState: true, replace: true }
+    {   
+        onBefore: () => confirm('Are you sure you want to delete this contact person?'),
+        preserveState: false, 
+        replace: true, 
+        onSuccess: () => {  },
+        onError:(e) => { handleError(e)}, 
+    }
   );
 }
 </script>
