@@ -7,9 +7,12 @@ use App\Models\Project;
 
 class ProjectRepository implements ProjectRepositoryInterface {
     
-    public function getProjectsForList()
+    public function getProjectsForList($request)
     {
         return Project::withCount('contactPeople')
+        ->when($request->filter, function($query, $filter){
+            $query->whereIn('status', $filter);
+        })
         ->paginate(config('settings.pagination'));
     }
 
@@ -33,7 +36,6 @@ class ProjectRepository implements ProjectRepositoryInterface {
 
     public function deleteProject(Project $project)
     {
-        $project->contactPeople()->sync([]);
         $project->delete();
     }
 }

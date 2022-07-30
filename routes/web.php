@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ContactPersonController;
 use App\Http\Controllers\ProjectController;
 use Illuminate\Support\Facades\Route;
 
@@ -18,9 +19,7 @@ Route::get('/', function(){
     return redirect()->route('projects.index'); 
 });
 
-Route::controller(ProjectController::class)
-->name('projects.')
-->prefix('projects')
+Route::controller(ProjectController::class)->name('projects.')->prefix('projects')
 ->group(function () {
     Route::get('/', 'index')->name('index');
     Route::get('/create', 'create')->name('create');
@@ -28,4 +27,11 @@ Route::controller(ProjectController::class)
     Route::get('/{project}', 'show')->name('show');
     Route::put('/{project}', 'update')->name('update');
     Route::delete('/{project}', 'delete')->name('delete');
+});
+
+
+Route::controller(ContactPersonController::class)->name('contact-person.')->prefix('contact-person')
+->group(function () {
+    Route::put('/{contactPerson}', 'update')->name('update');
+    Route::delete('/{contactPerson}', 'delete')->name('delete');
 });

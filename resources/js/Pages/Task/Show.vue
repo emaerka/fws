@@ -93,7 +93,7 @@
               <fieldset class="space-y-5">
                 <div
                   class="relative flex items-start"
-                  v-for="person in contactPeople.data"
+                  v-for="(person, index) in contactPeople.data"
                   :key="person.id"
                 >
                   <div class="flex items-center h-5">
@@ -104,18 +104,36 @@
                       type="checkbox"
                       v-model="form.contact_people"
                       :value="person.id"
+                      
                       class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300 rounded"
                     />
                   </div>
-                  <div class="ml-3 text-sm">
-                    <label
+                  <div class="ml-3 text-sm flex flex-col w-full text-left">
+                    <input
                       :for="'candidates_' + person.id"
                       class="font-medium text-gray-700"
-                      >{{ person.name }}</label
-                    >
-                    <p id="candidates-description" class="text-gray-500">
-                      {{ person.email }}
-                    </p>
+                      v-model="contactPeopleList.value[index].name"
+                      />
+                    <input id="candidates-description" class="text-gray-500" 
+                    v-model="contactPeopleList.value[index].email"
+>
+                    <div class="flex">
+                        <button
+                        type="button"
+                        class="text-indigo-600 hover:text-indigo-900 text-left w-max"
+                        @click="deleteContactPerson(person.id)"
+                        >
+                        Delete
+                        </button>
+
+                        <button
+                        type="button"
+                        class="text-indigo-600 hover:text-indigo-900 text-left w-max ml-3"
+                        @click="saveContactPerson(contactPeopleList.value[index])"
+                        >
+                        Save
+                        </button>
+                    </div>
                   </div>
                 </div>
               </fieldset>
@@ -146,22 +164,30 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
-import {
-  Listbox,
-  ListboxButton,
-  ListboxLabel,
-  ListboxOption,
-  ListboxOptions,
-} from "@headlessui/vue";
-import { CheckIcon, SelectorIcon } from "@heroicons/vue/solid";
+import { reactive, ref } from "vue";
 import { useForm } from "@inertiajs/inertia-vue3";
+import { Inertia } from "@inertiajs/inertia";
+import { watch } from "vue";
+import throttle from "lodash/throttle";
 
 const props = defineProps({
     contactPeople: Array,
     status : Array,
     project: Object,
 })
+
+let contactPeopleList = reactive({value : props.contactPeople.data })
+
+const saveContactPerson = (contactPerson) => {
+    request(contactPerson)
+}
+
+function request(contactPerson) {
+  Inertia.put(route('contact-person.update', {contactPerson: contactPerson.id}),
+    contactPerson,
+    { preserveState: true, replace: true,  preserveScroll: true }
+  );
+}
 
 let form = useForm({
     name: props.project ? props.project.data.name : null,
@@ -198,5 +224,12 @@ const handleSuccess = (text) => {
 
 const handleError = (e, text) => {
     alert(text ?? 'Error', e)
+}
+
+const deleteContactPerson = (id) => {
+    Inertia.delete(route('contact-person.delete', {contactPerson: id}),
+    {},
+    { preserveState: true, replace: true }
+  );
 }
 </script>
